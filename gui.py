@@ -6,6 +6,9 @@ from copy import deepcopy
 import tkinter.messagebox as msgbox
 import tkinter.font
 
+from solver import *
+from mysolver import *
+
 
 
 # data save
@@ -113,6 +116,17 @@ def update_game():
     # print('\n'.join([' '.join(map(str, j)) for j in list(game.getintegerfield(True))]))
     print(str(game))
     print("\n")
+    # minesweeperOperations(game.getintegerfield(), 16, 16)
+    solved = Solve(game)
+    solved.solve()
+    for j in range(sizey):
+        for i in range(sizex):
+            grid[j][i].config(bg="white")
+            if (i,j) in solved.mineblocks:
+                grid[j][i].config(bg="red")
+            if (i,j) in solved.safeblocks:
+                grid[j][i].config(bg="green")
+
 
 def save_log():
     (data_dir / ("data" + str(len(list(data_dir.iterdir())) + 1))).with_suffix(".pkl").write_bytes(dumps(game_log))

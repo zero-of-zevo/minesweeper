@@ -30,7 +30,7 @@ for target in data_dir.iterdir():
 data_input = np.array([i[0].field] for i in data)
 
 input_shape = (16, 16)
-output_shape = (16, 16)
+output_shape = (1)
 
 model = tf.keras.models.Sequential([
   tf.keras.Input(shape=input_shape),
