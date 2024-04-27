@@ -2,6 +2,9 @@ import random
 from enum import Enum
 from dataclasses import dataclass
 from random import sample
+from typing import Any, Literal, NoReturn, cast, overload
+import numpy as np
+NDArray = np.ndarray
 
 class State(Enum):
     CLOSED = 0
@@ -80,9 +83,17 @@ class Game():
     @property
     def leftmine(self):
         return self.minecount - sum(i.state == State.FLAGGED for j in self.field for i in j)
-    
-    def getintegerfield(self, isstr = False):
-        data = [[' ' for _ in range(self.size[0])] for _ in range(self.size[1])]
+    @overload
+    def getintegerfield(self, isstr: Literal[True], isnp: Literal[False]) -> list[list[str]]: pass
+    @overload
+    def getintegerfield(self, isstr: Literal[False], isnp: Literal[False]) -> list[list[int]]: pass
+    @overload
+    def getintegerfield(self, isstr: Literal[True], isnp: Literal[True]) -> NoReturn: pass
+    @overload
+    def getintegerfield(self, isstr: Literal[False], isnp: Literal[True]) -> NDArray: pass
+    def getintegerfield(self, isstr = False, isnp = False):
+        fill = 9 if isstr else " "
+        data: list[list[str | int]] = [[fill for _ in range(self.size[0])] for _ in range(self.size[1])]
         if isstr:
             for j in range(self.size[0]):
                 for i in range(self.size[1]):
@@ -92,6 +103,7 @@ class Game():
                         data[j][i] = str(10)
                     else:
                         data[j][i] = str(9)
+            return cast(list[list[str]], data)
         else:
             for j in range(self.size[0]):
                 for i in range(self.size[1]):
@@ -101,7 +113,9 @@ class Game():
                         data[j][i] = 10
                     else:
                         data[j][i] = 9
-        return data
+            if isnp:
+                return np.array(cast(list[list[int]], data))
+            return cast(list[list[int]], data)
 
     def __str__(self):
         return '\n'.join([' '.join(map(str, j)) for j in self.field])

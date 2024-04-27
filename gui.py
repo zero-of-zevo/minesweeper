@@ -1,12 +1,12 @@
 import tkinter
-from Game import *
+from game import *
 from pathlib import Path, PurePath
 from pickle import dumps
 from copy import deepcopy
 import tkinter.messagebox as msgbox
 import tkinter.font
 
-from solver import *
+from exsolver import *
 from mysolver import *
 
 
@@ -85,28 +85,31 @@ def update_game():
     label2.config(text="남은 지뢰 갯수 : " + str(game.leftmine))
     for j in range(sizey):
         for i in range(sizex):
-            grid[j][i].config(text = str(game.field[j][i]))
-            if game.field[j][i].state == State.CLOSED:
-                grid[j][i].config(fg="gray")
-            if game.field[j][i].state == State.OPENED:
-                if game.field[j][i].around == 1:
-                    grid[j][i].config(fg="#2828CD")
-                if game.field[j][i].around == 2:
-                    grid[j][i].config(fg="#2E8B57")
-                if game.field[j][i].around == 3:
-                    grid[j][i].config(fg="#B90000")
-                if game.field[j][i].around == 4:
-                    grid[j][i].config(fg="#1E3269")
-                if game.field[j][i].around == 5:
-                    grid[j][i].config(fg="#800000")
-                if game.field[j][i].around == 6:
-                    grid[j][i].config(fg="#008080")
-                if game.field[j][i].around == 7:
-                    grid[j][i].config(fg="black")
-                if game.field[j][i].around == 8:
-                    grid[j][i].config(fg="gray")
-            if game.field[j][i].state is State.FLAGGED:
-                    grid[j][i].config(fg="red")    
+            block = game.field[j][i]
+            btn = grid[j][i]
+            btn.config(text = str(block))
+            if block.state == State.CLOSED:
+                btn.config(fg="gray")
+            if block.state == State.OPENED:
+                btn.config(fg=["#2828CD", "#2E8B57", "#B90000", "#1E3269", "#800000", "#008080", "black", "gray"][block.around-1])
+                # if block.around == 1:
+                #     btn.config(fg="#2828CD")
+                # if block.around == 2:
+                #     btn.config(fg="#2E8B57")
+                # if block.around == 3:
+                #     btn.config(fg="#B90000")
+                # if block.around == 4:
+                #     btn.config(fg="#1E3269")
+                # if block.around == 5:
+                #     btn.config(fg="#800000")
+                # if block.around == 6:
+                #     btn.config(fg="#008080")
+                # if block.around == 7:
+                #     btn.config(fg="black")
+                # if block.around == 8:
+                #     btn.config(fg="gray")
+            if block.state is State.FLAGGED:
+                    btn.config(fg="red")    
     if game.gameover:
         msgbox.showinfo("Game Over", "You lose!")
         close(False)
@@ -118,15 +121,20 @@ def update_game():
     print("\n")
     # minesweeperOperations(game.getintegerfield(), 16, 16)
     solved = Solve(game)
-    solved.solve()
+    solved.buildminesets()
+    
     for j in range(sizey):
         for i in range(sizex):
             grid[j][i].config(bg="white")
-            if (i,j) in solved.mineblocks:
+            if (i,j) in solved.validblocks:
+                grid[j][i].config(bg="yellow")
+            if (i,j) in list(solved.mineblocks.keys()) and solved.mineblocks[(i,j)] == 1:
                 grid[j][i].config(bg="red")
-            if (i,j) in solved.safeblocks:
+            if (i,j) in solved.mineblocks:
                 grid[j][i].config(bg="green")
-
+    # print(solved.validblocks)
+    # print(solved.mineblocks)
+    # print(solved.minesets)
 
 def save_log():
     (data_dir / ("data" + str(len(list(data_dir.iterdir())) + 1))).with_suffix(".pkl").write_bytes(dumps(game_log))
