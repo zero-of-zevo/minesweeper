@@ -5,11 +5,18 @@ from functools import reduce
 
 offset: TypeAlias = tuple[int, int]
 
+def diffrentarr(d):
+    return list(dict.fromkeys(d, None).keys())
+
+def diffrenttuple(d):
+    return tuple(dict.fromkeys(d, None).keys())
+
 class Solve:
     def __init__(self, game:Game) -> None:
         self.game = game
         self.openedblocks:set[offset] = set() # (x, y)
         # self.mineblocks:dict[offset:float] = {} #(x, y): percentage
+        self.mineblocks:tuple[offset,...] = ()
         for j in range(game.size[1]):
             for i in range(game.size[0]):
                 if self.game.field[j][i].state == State.OPENED and not self.game.field[j][i].around == 0 :
@@ -19,7 +26,7 @@ class Solve:
             tuple[
                 list[offset], # centerblock. around
                 list[offset], # aroundclosedblockes
-                tuple[list[offset]] # combination of aroundclosedblockes
+                tuple[tuple[offset, ...], ...] # combination of aroundclosedblockes
                 ]
             ] = []
     def buildminesets(self):
@@ -40,11 +47,7 @@ class Solve:
                             [(x,y)],
                             aroundclosedblockes,
                             tuple(
-                                reduce(
-                                    lambda l,t : (l, l.extend(t))[0], 
-                                    itertools.combinations(
-                                        aroundclosedblockes,
-                                        self.game.field[y][x].around - len(aroundflaggedblockes)), [])
+                                list(itertools.combinations(aroundclosedblockes, self.game.field[y][x].around - len(aroundflaggedblockes)))
                                 # list(map(
                                 #     lambda x : x*,
                                 #     itertools.combinations(
@@ -52,39 +55,93 @@ class Solve:
                                 #     self.game.field[y][x].around - len(aroundflaggedblockes)
                                 #     ))))
                                 )))
-            self.solveminesets()
+        self.solveminesets()
     
     def solveminesets(self):
         # self.clearvalid()
-        minesetcouples = list(itertools.combinations(list(self.minesets), 2))
+        # minesetcouples = list(itertools.combinations(list(self.minesets), 2))
         newminesets:list[
             tuple[
                 list[offset], # centerblock. around
                 list[offset], # aroundclosedblockes
-                tuple[list[offset]] # combination of aroundclosedblockes
+                tuple[tuple[offset, ...], ...] # combination of aroundclosedblockes
                 ]
             ] = []
-        for d in minesetcouples:
-            if len(list(d[0][1].intersection(d[1][1])))>0:
-                newcenterblocks = d[0][0].union(d[1][0])
-                newaround = d[0][1].union(d[1][1])
+        
+        print("p1")
+        # if len([i for i in self.minesets[0][1] if i in self.minesets[1][1]])>0:
+        newcenterblocks = self.minesets[0][0] + self.minesets[1][0]
+        newaround = diffrentarr(self.minesets[0][1] + self.minesets[1][1])
+        intersctrions:list[offset] = diffrentarr([i for i in self.minesets[0][1] if i in self.minesets[1][1]])
+        newcombination:list[tuple[offset, ...]] = []
+        print("p2")
+        # for d0 in self.minesets[0][2]:
+        #     for d1 in self.minesets[1][2]:
+        #         if [i for i in intersctrions if i in d0] == [i for i in intersctrions if i in d1]:
+        #             newcombination.append(diffrenttuple(d0 + d1))
+        # for d0 in self.minesets[0][2]:
+        #     for d1 in self.minesets[1][2]:
+        #         boolean = True
+        #         for i in intersctrions:
+        #             if (i in d0) ^ (i in d1):
+        #                 boolean = False
+        #                 break
+        #         if boolean:
+        #             newcombination.append(diffrenttuple(d0+d1))
+        for d0 in self.minesets[0][2]:
+            is_in_d0 = [i in d0 for i in intersctrions]
+            for d1 in self.minesets[1][2]:
+                boolean = True
 
-                intersctrions = d[0][1].intersection(d[1][1])
-                newcombination:list[frozenset[offset]] = []
-                for d0 in d[0][2]:
-                    for d1 in d[1][2]:
-                        if intersctrions.intersection(d0) == intersctrions.intersection(d0):
-                            newcombination.append(d0.union(d1))
-                newminesets.add((
-                        newcenterblocks,
-                        newaround,
-                        tuple(newcombination)
-                        ))
-            else:
-                newminesets.add(d[0])
-                newminesets.add(d[1])
-        print(list(minesetcouples)[2])
-        print()
-        print(list(self.minesets)[2])
-        print()
-        print(list(newminesets)[2])
+                is_in_d1 = [i in d1 for i in intersctrions]
+                for i in range(len(intersctrions)):
+                    if is_in_d0[i] ^ is_in_d1[i]:
+                        boolean = False
+                        break
+                if boolean:
+                    newcombination.append(diffrenttuple(d0+d1))
+            # print()
+            # print(self.minesets[0])
+            # print(self.minesets[1])
+            # print((
+            #         newcenterblocks,
+            #         newaround,
+            #         tuple(diffrentarr(newcombination))
+            #         ))
+        
+        print("p3")
+
+        newminesets.append((
+            newcenterblocks,
+            newaround,
+            tuple(diffrentarr(newcombination))
+            ))
+            # else:
+            #     newminesets.append(self.minesets[0])
+            #     newminesets.append(self.minesets[1])
+
+        print("p4")
+        print(len(self.minesets))
+        del self.minesets[0:2]
+        self.minesets.extend(newminesets)
+        print("p5")
+        if not len(self.minesets) == 1:
+            self.solveminesets()
+            for i in self.minesets[0][2]:
+                print(i)
+        else:
+            print(len(self.minesets[0][2][0]))
+            print(self.minesets[0][2][0])
+            print(len(diffrentarr(self.minesets[0][2][0])))
+            print(diffrentarr(self.minesets[0][2][0]))
+            
+            # print(len(tuple(set(self.minesets[0][2][0]))))
+        #     self.solveminesets()
+        
+        # print(len(self.minesets))
+
+        # print(minesetcouples[1])
+        # print()
+        # print(self.minesets[2])
+        # print()
+        # print(newminesets[2])

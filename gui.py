@@ -7,7 +7,7 @@ import tkinter.messagebox as msgbox
 import tkinter.font
 
 from exsolver import *
-from mysolver import *
+from solver import *
 
 
 
@@ -128,10 +128,12 @@ def update_game():
             grid[j][i].config(bg="white")
             if (i,j) in solved.validblocks:
                 grid[j][i].config(bg="yellow")
-            if (i,j) in list(solved.mineblocks.keys()) and solved.mineblocks[(i,j)] == 1:
+            if (i, j) in solved.mineblocks:
                 grid[j][i].config(bg="red")
-            if (i,j) in solved.mineblocks:
-                grid[j][i].config(bg="green")
+            # if (i,j) in list(solved.mineblocks.keys()) and solved.mineblocks[(i,j)] == 1:
+            #     grid[j][i].config(bg="red")
+            # if (i,j) in solved.mineblocks:
+            #     grid[j][i].config(bg="green")
     # print(solved.validblocks)
     # print(solved.mineblocks)
     # print(solved.minesets)
