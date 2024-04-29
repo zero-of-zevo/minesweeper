@@ -123,72 +123,117 @@ class Solve:
     
     # 여기까진 문제 없음
     
-    def solveminepredictsets(self):
-        for ci, cj in list(itertools.combinations(range(len(self.minepredictsets)), 2)):
-            print(ci, cj)
-
     # def solveminepredictsets(self):
-    #     # prevresult = deepcopy(self.minepredicts)
-    #     check1 = False
-    #     for di, dj in list(itertools.combinations(range(len(self.minepredictsets)), 2)):
-    #         intersections:list[offset] = list()
-    #         for i in self.minepredictsets[di][0]:
-    #             if i in self.minepredictsets[dj][0]:
-    #                 intersections.append(i)
-    #         intersections = diffrentlist(intersections)
-    #         if len(intersections) > 0: check1 = True
-    #         if check1:
-    #             # print(di, dj)
-    #             # print(self.minepredictsets[di][1])
-    #             # print(self.minepredictsets[dj][1])
-    #             newcombines:list[tuple[offset, ...]] = list()
-    #             for i in self.minepredictsets[di][1]:
-    #                 for j in self.minepredictsets[dj][1]:
-    #                     if len([x for x in intersections if x in diffrentlist(i)]) == len([x for x in intersections if x in diffrentlist(j)]):
-    #                         newcombines.append(i + j)
-    #             # print(newcombines)
-    #             self.minepredictsets.append(
-    #                 (
-    #                     self.minepredictsets[di][0] + self.minepredictsets[dj][0],
-    #                     diffrenttuple(newcombines)
-    #                 )
-    #             )
-    #             del self.minepredictsets[di]
-    #             del self.minepredictsets[dj]
-    #             break
-    #     if check1:
-    #         self.solveminepredictsets()
-    #     else:
-    #         if len(self.minepredictsets) > 0:
-    #             for i in self.minepredictsets:
-    #                 minepredictscount:dict[offset,int] = dict()
-    #                 t:int = 0
-    #                 for j in i[1]:
-    #                     for x in j:
-    #                         # print(x)
-    #                         if not x in minepredictscount.keys():
-    #                             minepredictscount[x] = 0
-    #                         if x in minepredictscount.keys():
-    #                             minepredictscount[x] += 1
-    #                         t+=1
-    #                         if not x in self.minepredicts.keys():
-    #                             self.minepredicts[x] = 0
-    #                 for ddd in minepredictscount.keys():
-    #                     if minepredictscount[ddd] == 0:
-    #                         self.safeblocks.append(ddd)
-    #                         print("added safe", ddd)
-    #                     elif minepredictscount[ddd] == 1:
-    #                         self.mineblocks.append(ddd)
-    #                         print("added mine", ddd)
+    #     for ci, cj in list(itertools.combinations(range(len(self.minepredictsets)+1), 2)):
+    #         print(ci, cj)
 
-    #                     else: self.minepredicts[ddd] = minepredictscount[ddd]/t
+    def solveminepredictsets(self):
+        print(self.minepredictsets)
+        for ci, cj in list(itertools.combinations(range(len(self.minepredictsets)), 2)):
+            print()
+            intersections:tuple[offset, ...] = tuple(i for i in self.minepredictsets[ci][0] if i in self.minepredictsets[cj][0])
+            # print(intersections)
+            if len(intersections) > 0:
+                newaround:tuple[offset, ...] = diffrenttuple(self.minepredictsets[ci][0]+self.minepredictsets[cj][0])
+                print(newaround)
+                newcombine:list[tuple[offset,...]] = list()
+                print(self.minepredictsets[ci][1])
+                print(self.minepredictsets[cj][1])
+                for sdi in self.minepredictsets[ci][1]:
+                    for sdj in self.minepredictsets[cj][1]:
+                        print("i", sdi)
+                        print("j", sdj)
+            
+        # check1 = False
+        # naround:tuple[offset, ...] = tuple()
+        # ncombine:list[tuple[offset, ...]] = list()
+        # for ci, cj in list(itertools.combinations(range(len(self.minepredictsets)), 2)):
+        #     intersections:set[offset] = set(self.minepredictsets[ci][0]).intersection(self.minepredictsets[cj][0])
+        #     if len(intersections) > 0: check1 = True
+        #     if check1:
+        #         newaround:tuple[offset, ...] = diffrenttuple(self.minepredictsets[ci][0]+self.minepredictsets[cj][0])
+        #         naround = diffrenttuple(self.minepredictsets[ci][0]+self.minepredictsets[cj][0])
+        #         newcombine:list[tuple[offset, ...]] = list()
+        #         for di in self.minepredictsets[ci][1]:
+        #             for dj in self.minepredictsets[cj][1]:
+        #                 interi = set(intersections).intersection(set(di))
+        #                 interj = set(intersections).intersection(set(dj))
+        #                 if interi == interj:
+        #                     newcombine.append(diffrenttuple(di+dj))
+        #                     ncombine.append(diffrenttuple(di+dj))
+        #         break
+        # print((naround, tuple(ncombine)))
+            
+                                
+                                    
+
+                            
+
+                
+                
+
+
+        # # prevresult = deepcopy(self.minepredicts)
+        # check1 = False
+        # for di, dj in list(itertools.combinations(range(len(self.minepredictsets)), 2)):
+        #     intersections:list[offset] = list()
+        #     for i in self.minepredictsets[di][0]:
+        #         if i in self.minepredictsets[dj][0]:
+        #             intersections.append(i)
+        #     intersections = diffrentlist(intersections)
+        #     if len(intersections) > 0: check1 = True
+        #     if check1:
+        #         # print(di, dj)
+        #         # print(self.minepredictsets[di][1])
+        #         # print(self.minepredictsets[dj][1])
+        #         newcombines:list[tuple[offset, ...]] = list()
+        #         for i in self.minepredictsets[di][1]:
+        #             for j in self.minepredictsets[dj][1]:
+        #                 if len([x for x in intersections if x in diffrentlist(i)]) == len([x for x in intersections if x in diffrentlist(j)]):
+        #                     newcombines.append(i + j)
+        #         # print(newcombines)
+        #         self.minepredictsets.append(
+        #             (
+        #                 self.minepredictsets[di][0] + self.minepredictsets[dj][0],
+        #                 diffrenttuple(newcombines)
+        #             )
+        #         )
+        #         del self.minepredictsets[di]
+        #         del self.minepredictsets[dj]
+        #         break
+        # if check1:
+        #     self.solveminepredictsets()
+        # else:
+        #     if len(self.minepredictsets) > 0:
+        #         for i in self.minepredictsets:
+        #             minepredictscount:dict[offset,int] = dict()
+        #             t:int = 0
+        #             for j in i[1]:
+        #                 for x in j:
+        #                     # print(x)
+        #                     if not x in minepredictscount.keys():
+        #                         minepredictscount[x] = 0
+        #                     if x in minepredictscount.keys():
+        #                         minepredictscount[x] += 1
+        #                     t+=1
+        #                     if not x in self.minepredicts.keys():
+        #                         self.minepredicts[x] = 0
+        #             for ddd in minepredictscount.keys():
+        #                 if minepredictscount[ddd] == 0:
+        #                     self.safeblocks.append(ddd)
+        #                     print("added safe", ddd)
+        #                 elif minepredictscount[ddd] == 1:
+        #                     self.mineblocks.append(ddd)
+        #                     print("added mine", ddd)
+
+        #                 else: self.minepredicts[ddd] = minepredictscount[ddd]/t
                     
                     
-    #         print(self.minepredicts)
+        #     print(self.minepredicts)
 
-    #     # if not self.minepredicts == prevresult:
-    #     #     self.solveminepredictsets()
-    #     #     print(len(self.minepredictsets))
-    #                 # print(list(itertools.product(
-    #                 #     list(map(lambda x: list(x), self.minepredictsets[di][1])), 
-    #                 #     list(map(lambda x: list(x), self.minepredictsets[di][1])))))
+        # if not self.minepredicts == prevresult:
+        #     self.solveminepredictsets()
+        #     print(len(self.minepredictsets))
+                    # print(list(itertools.product(
+                    #     list(map(lambda x: list(x), self.minepredictsets[di][1])), 
+                    #     list(map(lambda x: list(x), self.minepredictsets[di][1])))))
