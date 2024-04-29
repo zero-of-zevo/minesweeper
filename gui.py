@@ -5,9 +5,10 @@ from pickle import dumps
 from copy import deepcopy
 import tkinter.messagebox as msgbox
 import tkinter.font
+from base64 import b16encode
 
 from exsolver import *
-from solver import *
+from solver2 import *
 
 
 
@@ -35,11 +36,33 @@ frame1=tkinter.Frame(window, relief="solid", bd=0, height=1)
 frame1.pack(side="top", fill="both")
 
 game = Game(16, 16, 40)
-
+solved = Solve(game)
+   
 # game = Game(12, 12, 8)
+
+
+def solve():
+    global solved
+    solved = Solve(game)
+    solved.solve()
+    update_game()
 
 label2=tkinter.Label(window, text="남은 지뢰 갯수 : 0", fg="black", relief="solid", bd=0, font=lightfont)
 label2.pack()
+
+btn2=tkinter.Button(window, overrelief="solid", width=5, height=1, padx=0, pady=0, repeatdelay=1000, repeatinterval=100, text= "solve", command=solve, font=font, fg="black")
+btn2.pack()
+
+def reset_game():
+    print("======================================")
+    global game
+    game = Game(16, 16, 40)
+    global solved
+    solved = Solve(game)
+    update_game()
+
+btn3=tkinter.Button(window, overrelief="solid", width=5, height=1, padx=0, pady=0, repeatdelay=1000, repeatinterval=100, text= "reset", command=reset_game, font=font, fg="black")
+btn3.pack()
 
 frame1=tkinter.Frame(window, relief="solid", bd=0, height=1)
 frame1.pack(side="top", fill="both")
@@ -82,6 +105,8 @@ def open(x, y):
     update_game()
 
 def update_game():
+    # print("================================")
+    # print(str(game))
     label2.config(text="남은 지뢰 갯수 : " + str(game.leftmine))
     for j in range(sizey):
         for i in range(sizex):
@@ -109,31 +134,45 @@ def update_game():
                 # if block.around == 8:
                 #     btn.config(fg="gray")
             if block.state is State.FLAGGED:
-                    btn.config(fg="red")    
+                    btn.config(fg="red")
+
+    # print('\n'.join([' '.join(map(str, j)) for j in list(game.getintegerfield(True))]))
+    # print(str(game))
+    # print("\n")
+    # minesweeperOperations(game.getintegerfield(), 16, 16)
+
+    testlist = []
+
+    for i in solved.minepredictsets:
+        for j in i[0]:
+            testlist.append(j)
+    # print(testlist)
+
+    for j in range(sizey):
+        for i in range(sizex):
+            grid[j][i].config(bg="white")
+            if (i,j) in solved.validblocks:
+                grid[j][i].config(bg="yellow")
+            if (i, j) in solved.mineblocks and not game.field[j][i].state == State.FLAGGED:
+                grid[j][i].config(bg="red")
+            if (i, j) in solved.minepredicts.keys():
+                d = round(255*solved.minepredicts[(i, j)])
+                grid[j][i].config(bg='#%02x%02x%02x' % (d, 255-d, 0))
+            # if (i,j) in list(solved.mineblocks.keys()) and solved.mineblocks[(i,j)] == 1:
+            #     grid[j][i].config(bg="red")
+            if (i,j) in solved.safeblocks:
+                grid[j][i].config(bg="green")
+            if (i, j) in testlist:
+                grid[j][i].config(bg="orange")
+    
+    
     if game.gameover:
         msgbox.showinfo("Game Over", "You lose!")
         close(False)
     if game.is_win:
         msgbox.showinfo("Game Over", "You win!")
         close(True)
-    # print('\n'.join([' '.join(map(str, j)) for j in list(game.getintegerfield(True))]))
-    print(str(game))
-    print("\n")
-    # minesweeperOperations(game.getintegerfield(), 16, 16)
-    solved = Solve(game)
-    solved.buildminesets()
     
-    for j in range(sizey):
-        for i in range(sizex):
-            grid[j][i].config(bg="white")
-            if (i,j) in solved.validblocks:
-                grid[j][i].config(bg="yellow")
-            if (i, j) in solved.mineblocks:
-                grid[j][i].config(bg="red")
-            # if (i,j) in list(solved.mineblocks.keys()) and solved.mineblocks[(i,j)] == 1:
-            #     grid[j][i].config(bg="red")
-            # if (i,j) in solved.mineblocks:
-            #     grid[j][i].config(bg="green")
     # print(solved.validblocks)
     # print(solved.mineblocks)
     # print(solved.minesets)

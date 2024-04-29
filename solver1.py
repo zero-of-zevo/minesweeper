@@ -88,17 +88,19 @@ class Solve:
         #                 break
         #         if boolean:
         #             newcombination.append(diffrenttuple(d0+d1))
-        for d0 in self.minesets[0][2]:
-            is_in_d0 = [i in d0 for i in intersctrions]
-            for d1 in self.minesets[1][2]:
-                boolean = True
+        def make_2n(d: tuple[offset, ...], intersctrions: list[offset]):
+            n = 0
+            for i in intersctrions:
+                n = (n << 1) | (i in d)
+            return n
+        is_in_d0_list = [make_2n(d0, intersctrions) for d0 in self.minesets[0][2]]
+        is_in_d1_list = [make_2n(d1, intersctrions) for d1 in self.minesets[1][2]]
+        for i0, d0 in enumerate(self.minesets[0][2]):
+            is_in_d0 = is_in_d0_list[i0]
+            for i1, d1 in enumerate(self.minesets[1][2]):
 
-                is_in_d1 = [i in d1 for i in intersctrions]
-                for i in range(len(intersctrions)):
-                    if is_in_d0[i] ^ is_in_d1[i]:
-                        boolean = False
-                        break
-                if boolean:
+                is_in_d1 = is_in_d1_list[i1]
+                if not (is_in_d0 ^ is_in_d1):
                     newcombination.append(diffrenttuple(d0+d1))
             # print()
             # print(self.minesets[0])
@@ -123,7 +125,10 @@ class Solve:
         print("p4")
         print(len(self.minesets))
         del self.minesets[0:2]
-        self.minesets.extend(newminesets)
+        for i in newminesets:
+            self.minesets.insert(0, i)
+            
+            
         print("p5")
         if not len(self.minesets) == 1:
             self.solveminesets()
