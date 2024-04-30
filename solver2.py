@@ -25,6 +25,8 @@ class Solve:
             ] = list()
         self.minepredicts:dict[offset,float] = dict()
 
+        self.check1 = False # checkpoint 1
+
     def solve(self):
         #0. valid block 채우기
         self.fillvalidblocks()
@@ -115,6 +117,7 @@ class Solve:
                                 aroundblocks.append((i+x, j+y))
             self.minepredictsets.append((tuple(aroundblocks), tuple(itertools.combinations(aroundblocks, around))))
             self.minepredictsets = diffrentlist(self.minepredictsets)
+
         
         #     print(x,y)
         #     print(around)
@@ -128,21 +131,68 @@ class Solve:
     #         print(ci, cj)
 
     def solveminepredictsets(self):
-        print(self.minepredictsets)
-        for ci, cj in list(itertools.combinations(range(len(self.minepredictsets)), 2)):
-            print()
-            intersections:tuple[offset, ...] = tuple(i for i in self.minepredictsets[ci][0] if i in self.minepredictsets[cj][0])
+        # print(self.minepredictsets)
+        for ci, cj in list(itertools.combinations(self.minepredictsets, 2)):
+            
+            # print()
+            # print(ci)
+            # print(cj)
+            intersections:tuple[offset, ...] = tuple(i for i in ci[0] if i in cj[0])
             # print(intersections)
             if len(intersections) > 0:
-                newaround:tuple[offset, ...] = diffrenttuple(self.minepredictsets[ci][0]+self.minepredictsets[cj][0])
-                print(newaround)
+                self.check1 = True
+                newaround:tuple[offset, ...] = diffrenttuple(ci[0]+cj[0])
                 newcombine:list[tuple[offset,...]] = list()
-                print(self.minepredictsets[ci][1])
-                print(self.minepredictsets[cj][1])
-                for sdi in self.minepredictsets[ci][1]:
-                    for sdj in self.minepredictsets[cj][1]:
-                        print("i", sdi)
-                        print("j", sdj)
+                for sdi in ci[1]:
+                    for sdj in cj[1]:
+                        iteri = set(d for d in sdi if d in intersections)
+                        iterj = set(d for d in sdj if d in intersections)
+                        if iteri == iterj:
+                            newcombine.append(diffrenttuple(sdi + sdj))
+                # print(newaround)
+                # print("combine", tuple(newcombine))
+                self.minepredictsets.remove(ci)
+                self.minepredictsets.remove(cj)
+                self.minepredictsets.append((newaround, tuple(newcombine)))
+                break
+        if self.check1:
+            self.check1 = False
+            self.solveminepredictsets()
+        else:
+            for d in self.minepredictsets:
+                print(d[0], "|||", d[1])
+                minecount: dict[offset, int] = {}
+                for dd in d[1]:
+                    for ddd in d[0]:
+                        if not ddd in minecount.keys():
+                            minecount[ddd] = 0
+                        if ddd in dd:
+                            minecount[ddd] += 1
+                for dd in minecount.keys():
+                    count = minecount[dd]
+                    if count == 0:
+                        self.safeblocks.append(dd)
+                    elif count == len(d[1]):
+                        self.mineblocks.append(dd)
+                    else:
+                        self.minepredicts[dd] = count/len(d[1])
+            print(self.minepredicts)
+                            
+                # if len(d[1]) == 1:
+                #     for ci in d[0]:
+                #         if ci in d[1][0]:
+                #             self.mineblocks.append(ci)
+                #         else: self.safeblocks.append(ci)
+
+            # # print(intersections)
+            # if len(intersections) > 0:
+            #     print(newaround)
+            #     print(self.minepredictsets[ci][1])
+            #     print(self.minepredictsets[cj][1])
+            #     for sdi in self.minepredictsets[ci][1]:
+            #         for sdj in self.minepredictsets[cj][1]:
+            #             print("i", sdi)
+            #             print("j", sdj)
             
         # check1 = False
         # naround:tuple[offset, ...] = tuple()

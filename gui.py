@@ -153,8 +153,6 @@ def update_game():
             grid[j][i].config(bg="white")
             if (i,j) in solved.validblocks:
                 grid[j][i].config(bg="yellow")
-            if (i, j) in testlist:
-                grid[j][i].config(bg="orange")
             if (i, j) in solved.mineblocks and not game.field[j][i].state == State.FLAGGED:
                 grid[j][i].config(bg="red")
             if (i, j) in solved.minepredicts.keys():
@@ -164,6 +162,13 @@ def update_game():
             #     grid[j][i].config(bg="red")
             if (i,j) in solved.safeblocks:
                 grid[j][i].config(bg="green")
+            if (i, j) in testlist:
+                if (i, j) in solved.mineblocks:
+                    grid[j][i].config(bg="purple")
+                elif (i, j) in solved.safeblocks:
+                    grid[j][i].config(bg="lime")
+                else:
+                    grid[j][i].config(bg="orange")
             
     
     
@@ -183,7 +188,5 @@ def save_log():
 
 def close(save):
     if save: save_log()
-    window.quit()
-    window.destroy()
 
 window.mainloop()
