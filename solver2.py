@@ -160,7 +160,7 @@ class Solve:
             self.solveminepredictsets()
         else:
             for d in self.minepredictsets:
-                print(d[0], "|||", d[1])
+                # print(d[0], "|||", d[1])
                 minecount: dict[offset, int] = {}
                 for dd in d[1]:
                     for ddd in d[0]:
@@ -176,7 +176,7 @@ class Solve:
                         self.mineblocks.append(dd)
                     else:
                         self.minepredicts[dd] = count/len(d[1])
-            print(self.minepredicts)
+            # print(self.minepredicts)
                             
                 # if len(d[1]) == 1:
                 #     for ci in d[0]:
